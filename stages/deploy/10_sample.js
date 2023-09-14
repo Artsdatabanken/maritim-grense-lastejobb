@@ -1,3 +1,3 @@
-const { log } = require("lastejobb");
+const { log } = require("@artsdatabanken/lastejobb");
 
 log.info("Processing...")
