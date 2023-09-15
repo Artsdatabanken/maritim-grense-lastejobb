@@ -1,0 +1,39 @@
+name: build and publish kommune
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: npm install
+      - run: npm update
+      - run: npm run download
+      - run: npm run transform
+      - name: Check downloaded files
+        run: ./.github/workflows/filecheck.sh
+      - name: Run deployment script
+        run: ./.github/workflows/deploy.sh
+        shell: bash
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: $( basename "$GITHUB_REPOSITORY" ).tar.gz"
+          tag: v_${{ github.run_number }}
+  workflow_dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fyrer NiN
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: artsdatabanken/nin-data-lastejobb
+          event-type: fra_kommune
